@@ -143,6 +143,7 @@ class SyntheticShapes(Dataset):
                 cv2.imwrite(str(Path(im_dir, '{}.png'.format(i))), image)
                 np.save(Path(pts_dir, '{}.npy'.format(i)), points)
 
+
     def _init_dataset(self,):
         # Parse drawing primitives
         primitives = parse_primitives(self.config['primitives'], self.drawing_primitives)
