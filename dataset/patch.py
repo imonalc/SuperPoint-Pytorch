@@ -153,8 +153,8 @@ if __name__=='__main__':
     for i,d in enumerate(cdataloader):
         if i>=3:
             break
-        img = (d['img']*255).cpu().numpy().squeeze().astype(np.int).astype(np.uint8)
-        img_warp = (d['warp_img']*255).cpu().numpy().squeeze().astype(np.int).astype(np.uint8)
+        img = (d['img']*255).cpu().numpy().squeeze().astype(int).astype(np.uint8)
+        img_warp = (d['warp_img']*255).cpu().numpy().squeeze().astype(int).astype(np.uint8)
         img = cv2.merge([img, img, img])
         img_warp = cv2.merge([img_warp, img_warp, img_warp])
         ##

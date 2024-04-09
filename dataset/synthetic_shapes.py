@@ -4,8 +4,14 @@ import numpy as np
 from tqdm import tqdm
 from pathlib import Path
 from torch.utils.data import Dataset
+
+
+import sys
+sys.path.append('..')
+
 from utils.params import dict_update, parse_primitives
 from utils.keypoint_op import compute_keypoint_map
+from .utils.spherical_module import *
 from dataset.utils import synthetic_dataset
 from dataset.utils.homographic_augmentation import homographic_aug_pipline
 from dataset.utils.photometric_augmentation import PhotoAugmentor
@@ -23,8 +29,10 @@ class SyntheticShapes(Dataset):
         'add_augmentation_to_test_set': False,
         'num_parallel_calls': 10,
         'generation': {
-            'split_sizes': {'training': 10000, 'validation': 200, 'test': 500},
-            'image_size': [960, 1280],
+            'split_sizes': {'training': 1, 'validation': 1, 'test': 1}, ####
+            #'split_sizes': {'training': 100, 'validation': 2, 'test': 5},
+            #'split_sizes': {'training': 10000, 'validation': 200, 'test': 500},
+            'image_size': [512, 1024],
             'random_seed': 0,
             'params': {
                 'generate_background': {
@@ -35,7 +43,7 @@ class SyntheticShapes(Dataset):
             },
         },
         'preprocessing': {
-            'resize': [240, 320],
+            'resize': [256, 512],
             'blur_size': 11,
         },
         'augmentation': {
@@ -91,14 +99,44 @@ class SyntheticShapes(Dataset):
                 image = synthetic_dataset.generate_background(
                         self.config['generation']['image_size'],
                         **self.config['generation']['params']['generate_background'])
-                points = np.array(getattr(synthetic_dataset, primitive)(
+                
+                ### spherical image start ###
+                flag_spherical_image = True
+                if flag_spherical_image:
+                    res_std = 256
+                    b_images, _ = create_cube_imgs(image)
+                    all_images_list, all_points_list = [], []
+                    for img in b_images:
+                        img *= 255
+                        points = np.array(getattr(synthetic_dataset, primitive)(
+                                img, **self.config['generation']['params'].get(primitive, {})))
+                        all_images_list.append(img)
+                        all_points_list.append(points)
+
+                    cube_map_size = (res_std * 3, res_std * 4)
+                    cube_map = np.zeros(cube_map_size, dtype=np.uint8)
+
+                    positions = [(res_std, res_std), (res_std, 0), (res_std, res_std*3), 
+                                 (res_std, res_std*2), (0, res_std), (res_std*2, res_std)]
+                    for idx, (pos, img) in enumerate(zip(positions, all_images_list)):
+                        cube_map[pos[0]:pos[0]+res_std, pos[1]:pos[1]+res_std] = img
+                        all_points_list[idx][:, 0] += pos[1]
+                        all_points_list[idx][:, 1] += pos[0]
+
+                    image = cube_to_equirectangular_np(cube_map, res_std*4)*255
+                    points = np.concatenate(all_points_list, axis=0)
+                else:
+                    points = np.array(getattr(synthetic_dataset, primitive)(
                         image, **self.config['generation']['params'].get(primitive, {})))
+                #print(points)
+                ### spherical image end ###
+
                 points = np.flip(points, 1)  # reverse convention with opencv
 
                 b = self.config['preprocessing']['blur_size']
                 image = cv2.GaussianBlur(image, (b, b), 0)
-                points = (points * np.array(self.config['preprocessing']['resize'], np.float)
-                          / np.array(self.config['generation']['image_size'], np.float))
+                points = (points * np.array(self.config['preprocessing']['resize'], float)
+                          / np.array(self.config['generation']['image_size'], float))
                 image = cv2.resize(image, tuple(self.config['preprocessing']['resize'][::-1]),
                                    interpolation=cv2.INTER_LINEAR)
 
@@ -220,16 +258,16 @@ if __name__=="__main__":
     for i, d in enumerate(data_loaders['train']):
         if i >= 10:
             break
-        img = (d['raw']['img'][0] * 255).cpu().numpy().squeeze().astype(np.int).astype(np.uint8)
+        img = (d['raw']['img'][0] * 255).cpu().numpy().squeeze().astype(int).astype(np.uint8)
         img = cv2.merge([img, img, img])
         ##
         kpts = np.where(d['raw']['kpts_map'][0].squeeze().cpu().numpy())
         kpts = np.vstack(kpts).T
-        kpts = np.round(kpts).astype(np.int)
+        kpts = np.round(kpts).astype(int)
         for kp in kpts:
             cv2.circle(img, (kp[1], kp[0]), radius=3, color=(0, 255, 0))
 
-        mask = d['raw']['mask'][0].cpu().numpy().squeeze().astype(np.int).astype(np.uint8)*255
+        mask = d['raw']['mask'][0].cpu().numpy().squeeze().astype(int).astype(np.uint8)*255
 
         img = cv2.resize(img, (img.shape[1] * 2, img.shape[0] * 2))
 

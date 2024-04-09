@@ -193,7 +193,7 @@ def ratio_preserving_resize(img, target_size):
     '''
     scales = np.array((target_size[0]/img.shape[0], target_size[1]/img.shape[1]))##h_s,w_s
 
-    new_size = np.round(np.array(img.shape)*np.max(scales)).astype(np.int)#
+    new_size = np.round(np.array(img.shape)*np.max(scales)).astype(int)#
     temp_img = cv2.resize(img, tuple(new_size[::-1]))
     curr_h, curr_w = temp_img.shape
     target_h, target_w = target_size

@@ -342,8 +342,8 @@ def add_fog(img, keypoints, random_state=None, max_nb_ellipses=20,
     if random_state is None:
         random_state = np.random.RandomState(None)
 
-    centers = np.empty((0, 2), dtype=np.int)
-    rads = np.empty((0, 1), dtype=np.int)
+    centers = np.empty((0, 2), dtype=int)
+    rads = np.empty((0, 1), dtype=int)
     min_dim = min(img.shape) / 4
     shaded_img = img.copy()
     for i in range(max_nb_ellipses):

@@ -154,7 +154,7 @@ class PhotoAugmentor:
         np.random.shuffle(indices)
 
         # if image.dtype!=np.uint8:
-        #     image = image.astype(np.int).astype(np.uint8)
+        #     image = image.astype(int).astype(np.uint8)
         for i in indices:
             image = getattr(self, self.primitives[i])(image)
 
