@@ -157,7 +157,7 @@ def draw_lines(img, nb_lines=10):
             continue
         segments = np.concatenate([segments, np.array([[x1, y1, x2, y2]])], axis=0)
         col = get_random_color(background_color)
-        thickness = random_state.randint(min_dim * 0.01, min_dim * 0.02)
+        thickness = max(random_state.randint(min_dim * 0.01, min_dim * 0.02), 1)
         cv.line(img, (x1, y1), (x2, y2), col, thickness)
         points = np.concatenate([points, np.array([[x1, y1], [x2, y2]])], axis=0)
     return points
@@ -338,7 +338,7 @@ def draw_star(img, nb_branches=6):
     """
     num_branches = random_state.randint(3, nb_branches)
     min_dim = min(img.shape[0], img.shape[1])
-    thickness = random_state.randint(min_dim * 0.01, min_dim * 0.02)
+    thickness = max(random_state.randint(min_dim * 0.01, min_dim * 0.02), 1)
     rad = max(random_state.rand() * min_dim / 2, min_dim / 5)
     x = random_state.randint(rad, img.shape[1] - rad)  # select the center of a circle
     y = random_state.randint(rad, img.shape[0] - rad)
@@ -451,7 +451,7 @@ def draw_checkerboard(img, max_rows=7, max_cols=7, transform_params=(0.05, 0.15)
     # Draw lines on the boundaries of the board at random
     nb_rows = random_state.randint(2, rows + 2)
     nb_cols = random_state.randint(2, cols + 2)
-    thickness = random_state.randint(min_dim * 0.01, min_dim * 0.015)
+    thickness = max(random_state.randint(min_dim * 0.01, min_dim * 0.015), 1)
     for _ in range(nb_rows):
         row_idx = random_state.randint(rows + 1)
         col_idx1 = random_state.randint(cols + 1)
@@ -568,7 +568,7 @@ def draw_stripes(img, max_nb_cols=13, min_width_ratio=0.04,
     # Draw lines on the boundaries of the stripes at random
     nb_rows = random_state.randint(2, 5)
     nb_cols = random_state.randint(2, col + 2)
-    thickness = random_state.randint(min_dim * 0.01, min_dim * 0.015)
+    thickness = max(random_state.randint(min_dim * 0.01, min_dim * 0.015), 1)
     for _ in range(nb_rows):
         row_idx = random_state.choice([0, col + 1])
         col_idx1 = random_state.randint(col + 1)
@@ -608,7 +608,6 @@ def draw_cube(img, min_size_ratio=0.2, min_angle_rot=math.pi / 10,
     # Generate a cube and apply to it an affine transformation
     # The order matters!
     # The indices of two adjacent vertices differ only of one bit (as in Gray codes)
-    print(111)
     background_color = int(np.mean(img))
     min_dim = min(img.shape[:2])
     min_side = min_dim * min_size_ratio
@@ -667,7 +666,6 @@ def draw_cube(img, min_size_ratio=0.2, min_angle_rot=math.pi / 10,
         cv.fillPoly(img, [cube[faces[i]].reshape((-1, 1, 2))],
                     col_face)
     thickness = max(random_state.randint(min_dim * 0.003, min_dim * 0.015), 1)
-    print(thickness)
     for i in [0, 1, 2]:
         for j in [0, 1, 2, 3]:
             col_edge = (col_face + 128

@@ -157,7 +157,7 @@ def draw_lines(img, nb_lines=10):
             continue
         segments = np.concatenate([segments, np.array([[x1, y1, x2, y2]])], axis=0)
         col = get_random_color(background_color)
-        thickness = random_state.randint(min_dim * 0.01, min_dim * 0.02)
+        thickness = max(random_state.randint(min_dim * 0.01, min_dim * 0.02), 1)
         cv.line(img, (x1, y1), (x2, y2), col, thickness)
         points = np.concatenate([points, np.array([[x1, y1], [x2, y2]])], axis=0)
     return points
@@ -338,7 +338,7 @@ def draw_star(img, nb_branches=6):
     """
     num_branches = random_state.randint(3, nb_branches)
     min_dim = min(img.shape[0], img.shape[1])
-    thickness = random_state.randint(min_dim * 0.01, min_dim * 0.02)
+    thickness = max(random_state.randint(min_dim * 0.01, min_dim * 0.02), 1)
     rad = max(random_state.rand() * min_dim / 2, min_dim / 5)
     x = random_state.randint(rad, img.shape[1] - rad)  # select the center of a circle
     y = random_state.randint(rad, img.shape[0] - rad)
@@ -451,7 +451,7 @@ def draw_checkerboard(img, max_rows=7, max_cols=7, transform_params=(0.05, 0.15)
     # Draw lines on the boundaries of the board at random
     nb_rows = random_state.randint(2, rows + 2)
     nb_cols = random_state.randint(2, cols + 2)
-    thickness = random_state.randint(min_dim * 0.01, min_dim * 0.015)
+    thickness = max(random_state.randint(min_dim * 0.01, min_dim * 0.015), 1)
     for _ in range(nb_rows):
         row_idx = random_state.randint(rows + 1)
         col_idx1 = random_state.randint(cols + 1)
@@ -568,7 +568,7 @@ def draw_stripes(img, max_nb_cols=13, min_width_ratio=0.04,
     # Draw lines on the boundaries of the stripes at random
     nb_rows = random_state.randint(2, 5)
     nb_cols = random_state.randint(2, col + 2)
-    thickness = random_state.randint(min_dim * 0.01, min_dim * 0.015)
+    thickness = max(random_state.randint(min_dim * 0.01, min_dim * 0.015), 1)
     for _ in range(nb_rows):
         row_idx = random_state.choice([0, col + 1])
         col_idx1 = random_state.randint(col + 1)
@@ -655,7 +655,7 @@ def draw_cube(img, min_size_ratio=0.2, min_angle_rot=math.pi / 10,
     # The front one is 7
     cube = cube[:, :2]  # project on the plane z=0
     cube = cube.astype(int)
-    points = cube[1:, :]  # get rid of the hidden corner
+    points = cube[1:, :]  # get rid of the idden corner
 
     # Get the three visible faces
     faces = np.array([[7, 3, 1, 5], [7, 5, 4, 6], [7, 6, 2, 3]])

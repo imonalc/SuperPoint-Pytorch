@@ -76,7 +76,6 @@ def create_cube_imgs(img):
     z = (output_sqr / (2.0 * normalized_f))
     bottom_map_x, bottom_map_y = create_equirectangular_to_bottom_and_top_map(input_w, input_h, output_sqr, z)
     bottom_img = cv2.remap(img, bottom_map_x.astype("float32"), bottom_map_y.astype("float32"), cv2.INTER_CUBIC)
-    #bottom_img = cv2.rotate(bottom_img, cv2.ROTATE_90_CLOCKWISE)
 
     z = (-1) * (output_sqr / (2.0 * normalized_f))
     top_map_x, top_map_y = create_equirectangular_to_bottom_and_top_map(input_w, input_h, output_sqr, z)

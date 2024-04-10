@@ -175,6 +175,8 @@ if __name__=='__main__':
     if config['model']['name'] == 'superpoint':
         model = SuperPointBNNet(config['model'], device=device, using_bn=config['model']['using_bn'])
     elif config['model']['name'] == 'magicpoint':
+        print(1111)
+        print(config["model"])
         model = MagicPoint(config['model'], device=device)
 
     ##Load Pretrained Model
