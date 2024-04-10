@@ -209,7 +209,7 @@ if __name__=='__main__':
     h = np.array([[1,0.5,0],[0.5,1,0],[0,0,1]]).astype(np.float32)
     mask = cv2.warpPerspective(np.ones([24,32]), h, (32,24))
     mask = np.stack([mask,mask])
-    mask = mask.astype(np.int).astype(np.float32)
+    mask = mask.astype(int).astype(np.float32)
     ##
     loss = detector_loss_tf(keypoint_map, np.transpose(logits, (0,2,3,1)), valid_mask=mask)
 

@@ -24,7 +24,8 @@ model:
     name: 'superpoint'
     using_bn: true
     grid_size: 8
-    pretrained_model: './export/sp_0.pth'
+    #pretrained_model: './export/sp_0.pth'
+    pretrained_model: './export/sp_7_2.122.pth'
     nms: 8
     det_thresh: 0.001 #0.001
     topk: 1000

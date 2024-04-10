@@ -22,7 +22,9 @@ data:
 model:
     name: 'superpoint' #superpoint
     using_bn: true
-    pretrained_model: './export/sp_0.pth'
+    #pretrained_model: './export/sp_0.pth'
+    #pretrained_model: './export/sp_7_2.122.pth'
+    pretrained_model: "./wa"
     grid_size: 8
     backbone:
         backbone_type: 'VGG'
