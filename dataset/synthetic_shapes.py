@@ -120,11 +120,19 @@ class SyntheticShapes(Dataset):
                                  (res_std, res_std*2), (0, res_std), (res_std*2, res_std)]
                     for idx, (pos, img) in enumerate(zip(positions, all_images_list)):
                         cube_map[pos[0]:pos[0]+res_std, pos[1]:pos[1]+res_std] = img
-                        all_points_list[idx][:, 0] += pos[1]
-                        all_points_list[idx][:, 1] += pos[0]
+                        #all_points_list[idx][:, 0] += pos[1]
+                        #all_points_list[idx][:, 1] += pos[0]
+                    points_sph = []
+                    for idx in range(len(all_points_list)):
+                        points_tgt = all_points_list[idx]
+                        for (x_cube, y_cube) in points_tgt:
+                            x_sph, y_sph = cubemap_to_equirectangular_coord(idx, x_cube, y_cube)
+                            x_sph = (int(x_sph + 0.5) + res_std*4) % (res_std*4)
+                            y_sph = (int(y_sph + 0.5) + res_std*2) % (res_std*2)
+                            points_sph.append([x_sph, y_sph])
 
                     image = cube_to_equirectangular_np(cube_map, res_std*4)*255
-                    points = np.concatenate(all_points_list, axis=0)
+                    points = points_sph
                 else:
                     points = np.array(getattr(synthetic_dataset, primitive)(
                         image, **self.config['generation']['params'].get(primitive, {})))

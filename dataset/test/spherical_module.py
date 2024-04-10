@@ -224,3 +224,56 @@ def cube_to_equirectangular_np(img, width):
     ret_img = cv2.flip(ret_img, 0)
     
     return ret_img
+
+
+def cubemap_to_equirectangular_coord(face, x, y, cubemap_size=256):
+    """
+    Convert cubemap coordinates to equirectangular coordinates.
+
+    Parameters:
+    - face: The cubemap face index (0: front, 1: back, 2: right, 3: left, 4: top, 5: bottom).
+    - x, y: Coordinates on the specified cubemap face.
+    - cubemap_size: Size of each face of the cubemap.
+
+    Returns:
+    A tuple (equirect_x, equirect_y) of the equirectangular coordinates.
+    """
+    
+
+    # Convert cubemap (x, y) to 3D coordinates
+    nx = (x / cubemap_size) * 2 - 1
+    ny = (y / cubemap_size) * 2 - 1
+    if face == 0: # Front
+        vector = np.array([nx, -1, ny])
+        std = 1.5
+    elif face == 1: # Back
+        vector = np.array([nx, -1, ny])
+        std = 1
+    elif face == 2: # Right
+        vector = np.array([nx, -1, ny])
+        std = 0.5
+    elif face == 3: # Left
+        vector = np.array([-nx, 1, ny])
+        std = 1
+    elif face == 4: # Top
+        vector = np.array([ny, nx, -1])
+        std = 1
+    elif face == 5: # Bottom
+        vector = np.array([ny, -nx, 1])
+        std = 0
+
+    # Normalize vector
+    vector = vector / np.linalg.norm(vector)
+
+    # Convert 3D vector to spherical coordinates
+    longitude = np.arctan2(vector[1], vector[0])
+    latitude = np.arcsin(vector[2])
+
+    # Convert spherical coordinates to equirectangular
+    equirect_width = cubemap_size * 4
+    equirect_height = cubemap_size * 2
+    
+    equirect_x = ((longitude + np.pi* std) / (2 * np.pi)+1) * equirect_width % equirect_width
+    equirect_y = (latitude + np.pi / 2) / np.pi * equirect_height
+
+    return (equirect_x, equirect_y)
