@@ -6,8 +6,8 @@ data:
     data_dir: './data/synthetic_shapes'#where to save generated data
     preprocessing:
         blur_size: 21
-        resize: [256, 512]
-        #resize: [120, 160]
+        resize: [256, 512]  # add
+        #resize: [120, 160]  # original
     augmentation:
         photometric:
             enable: true
@@ -57,9 +57,9 @@ solver:
     grid_size: 8
     epoch: 20
     base_lr: 0.001
-    #train_batch_size: 64
-    #test_batch_size: 64
-    train_batch_size: 16
-    test_batch_size: 16
-    save_dir: './export'
+    train_batch_size: 64 # original
+    test_batch_size: 64 # original
+    #train_batch_size: 16 # add
+    #test_batch_size: 16 # add
+    save_dir: './export/mg_cyn'
     model_name: 'mg_syn'

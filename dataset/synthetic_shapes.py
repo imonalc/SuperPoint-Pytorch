@@ -29,9 +29,10 @@ class SyntheticShapes(Dataset):
         'add_augmentation_to_test_set': False,
         'num_parallel_calls': 10,
         'generation': {
-            #'split_sizes': {'training': 1, 'validation': 1, 'test': 1}, ####
-            'split_sizes': {'training': 100, 'validation': 2, 'test': 5},
-            #'split_sizes': {'training': 10000, 'validation': 200, 'test': 500},
+            #'split_sizes': {'training': 1, 'validation': 1, 'test': 1}, #### test 1
+            #'split_sizes': {'training': 100, 'validation': 2, 'test': 5}, # mini
+            #'split_sizes': {'training': 2000, 'validation': 40, 'test': 100}, # normal
+            'split_sizes': {'training': 10000, 'validation': 200, 'test': 500}, # Actual
             'image_size': [512, 1024],
             'random_seed': 0,
             'params': {
@@ -120,8 +121,7 @@ class SyntheticShapes(Dataset):
                                  (res_std, res_std*2), (0, res_std), (res_std*2, res_std)]
                     for idx, (pos, img) in enumerate(zip(positions, all_images_list)):
                         cube_map[pos[0]:pos[0]+res_std, pos[1]:pos[1]+res_std] = img
-                        #all_points_list[idx][:, 0] += pos[1]
-                        #all_points_list[idx][:, 1] += pos[0]
+
                     points_sph = []
                     for idx in range(len(all_points_list)):
                         points_tgt = all_points_list[idx]
@@ -130,16 +130,26 @@ class SyntheticShapes(Dataset):
                             x_sph = (int(x_sph + 0.5) + res_std*4) % (res_std*4)
                             y_sph = (int(y_sph + 0.5) + res_std*2) % (res_std*2)
                             points_sph.append([x_sph, y_sph])
+                        
 
                     image = cube_to_equirectangular_np(cube_map, res_std*4)*255
-                    points = points_sph
+                    if len(points_sph) == 0:
+                        points = np.empty((0, 2))
+                    else:
+                        points = np.array(points_sph)
                 else:
                     points = np.array(getattr(synthetic_dataset, primitive)(
                         image, **self.config['generation']['params'].get(primitive, {})))
                 #print(points)
                 ### spherical image end ###
+                #im_p = draw_interest_points(image, points)
+                #cv2.imshow('Random Lines', im_p/255)
+                #cv2.waitKey(0)
+                #cv2.destroyAllWindows()
 
+                #print(points.shape)
                 points = np.flip(points, 1)  # reverse convention with opencv
+            
 
                 b = self.config['preprocessing']['blur_size']
                 image = cv2.GaussianBlur(image, (b, b), 0)
@@ -286,3 +296,10 @@ if __name__=="__main__":
         plt.imshow(mask)
         plt.show()
 
+
+def draw_interest_points(img, points):
+    """ Convert img in RGB and draw in green the interest points """
+    img_rgb = np.stack([img, img, img], axis=2)
+    for i in range(points.shape[0]):
+        cv2.circle(img_rgb, (points[i][0], points[i][1]), 5, (0, 255, 0), -1)
+    return img_rgb
