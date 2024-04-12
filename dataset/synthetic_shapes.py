@@ -29,10 +29,10 @@ class SyntheticShapes(Dataset):
         'add_augmentation_to_test_set': False,
         'num_parallel_calls': 10,
         'generation': {
-            #'split_sizes': {'training': 1, 'validation': 1, 'test': 1}, #### test 1
+            'split_sizes': {'training': 1, 'validation': 1, 'test': 1}, #### test 1
             #'split_sizes': {'training': 100, 'validation': 2, 'test': 5}, # mini
             #'split_sizes': {'training': 2000, 'validation': 40, 'test': 100}, # normal
-            'split_sizes': {'training': 10000, 'validation': 200, 'test': 500}, # Actual
+            #'split_sizes': {'training': 10000, 'validation': 200, 'test': 500}, # Actual
             'image_size': [512, 1024],
             'random_seed': 0,
             'params': {

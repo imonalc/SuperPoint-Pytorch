@@ -1,0 +1,3 @@
+[submodule "model/modules/icoCNN"]
+	path = model/modules/icoCNN
+	url = git@github.com:DavidDiazGuerra/icoCNN.git
